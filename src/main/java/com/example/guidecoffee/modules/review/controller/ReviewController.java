@@ -9,35 +9,43 @@ import com.example.guidecoffee.shared.dto.PaginationMultipleResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
 
 @RestController
 @RequestMapping("/api/v1/reviews")
 @RequiredArgsConstructor
+@Validated
 @Tag(name = "Reviews", description = "Avaliações de cafeterias")
 public class ReviewController {
     private final CreateReviewService createReviewService;
     private final FindAllReviewService findAllReviewService;
     private final FindOneReviewService findOneReviewService;
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Criar avaliação")
-    public ResponseEntity<ReviewDTO> create(@RequestBody @Valid CreateReviewDTO review) {
+    public ResponseEntity<ReviewDTO> create(@ModelAttribute @Valid CreateReviewDTO review)  {
         return ResponseEntity.status(HttpStatus.CREATED).body(createReviewService.execute(review));
     }
 
     @GetMapping
     @Operation(summary = "Listar avaliações")
-    public ResponseEntity<PaginationMultipleResponse<ReviewDTO>> findAll(@RequestParam(defaultValue = "0") Integer offset, @RequestParam(defaultValue = "10") Integer limit) {
+    public ResponseEntity<PaginationMultipleResponse<ReviewDTO>> findAll(
+            @RequestParam(defaultValue = "0") @Min(0) @Max(10_000) Integer offset,
+            @RequestParam(defaultValue = "10") @Min(1) @Max(100) Integer limit
+    ) {
         var page = findAllReviewService.execute(offset, limit);
         return ResponseEntity.ok(new PaginationMultipleResponse<>(page));
     }

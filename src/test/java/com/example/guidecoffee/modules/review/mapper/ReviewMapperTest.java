@@ -4,6 +4,7 @@ import com.example.guidecoffee.modules.review.dto.CreateReviewDTO;
 import com.example.guidecoffee.modules.review.dto.ReviewDTO;
 import com.example.guidecoffee.modules.review.model.ReviewModel;
 import org.junit.jupiter.api.Test;
+import org.springframework.mock.web.MockMultipartFile;
 
 import java.time.Instant;
 
@@ -17,27 +18,32 @@ class ReviewMapperTest {
     void shouldMapCreateDtoToModel() {
         var input = new CreateReviewDTO(
                 "Café Central",
-                "https://example.com/cafe.jpg",
+                new MockMultipartFile("imageUrl", "cafe.jpg", "image/jpeg", "image".getBytes()),
                 "Café especial e atendimento cordial",
                 "Rua das Flores, 10",
                 5,
-                "Espresso",
-                -23.5505,
-                -46.6333
+                "Espresso"
         );
 
         ReviewModel result = mapper.toModel(input);
 
         assertThat(result.getId()).isNull();
         assertThat(result.getTitle()).isEqualTo(input.title());
-        assertThat(result.getImageUrl()).isEqualTo(input.imageUrl());
+        assertThat(result.getImageUrl()).isNull();
         assertThat(result.getDescription()).isEqualTo(input.description());
         assertThat(result.getAddress()).isEqualTo(input.address());
         assertThat(result.getRaiting()).isEqualTo(input.rating());
         assertThat(result.getDrinkType()).isEqualTo(input.drinkType());
-        assertThat(result.getLatitude()).isEqualTo(input.latitude());
-        assertThat(result.getLongitude()).isEqualTo(input.longitude());
         assertThat(result.getCreatedAt()).isNull();
+    }
+
+    @Test
+    void shouldMapProvidedImageUrlToModel() {
+        var input = new CreateReviewDTO("Café Central", null, "Descrição", "Rua 1", 5, "Espresso");
+
+        ReviewModel result = mapper.toModel(input, "https://example.com/cafe.jpg");
+
+        assertThat(result.getImageUrl()).isEqualTo("https://example.com/cafe.jpg");
     }
 
     @Test
@@ -51,8 +57,6 @@ class ReviewMapperTest {
                 .address("Rua das Flores, 10")
                 .raiting(5)
                 .drinkType("Espresso")
-                .latitude(-23.5505)
-                .longitude(-46.6333)
                 .createdAt(createdAt)
                 .build();
 
@@ -61,7 +65,7 @@ class ReviewMapperTest {
         assertThat(result).isEqualTo(new ReviewDTO(
                 "review-1", "Café Central", "https://example.com/cafe.jpg",
                 "Café especial", "Rua das Flores, 10", 5,
-                -23.5505, -46.6333, "Espresso", createdAt
+                "Espresso", createdAt
         ));
     }
 

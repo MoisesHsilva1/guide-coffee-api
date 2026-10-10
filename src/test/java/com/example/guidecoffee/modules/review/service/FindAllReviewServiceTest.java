@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -35,8 +36,8 @@ class FindAllReviewServiceTest {
     void shouldFetchPageAndMapEveryReview() {
         var first = ReviewModel.builder().id("1").title("First").build();
         var second = ReviewModel.builder().id("2").title("Second").build();
-        var firstDto = new ReviewDTO("1", "First", null, null, null, null, null, null, null, null);
-        var secondDto = new ReviewDTO("2", "Second", null, null, null, null, null, null, null, null);
+        var firstDto = new ReviewDTO("1", "First", null, null, null, null, null, null);
+        var secondDto = new ReviewDTO("2", "Second", null, null, null, null, null, null);
         var page = new PageImpl<>(List.of(first, second));
 
         when(reviewRepository.findAll(org.mockito.ArgumentMatchers.any(Pageable.class))).thenReturn(page);
@@ -52,5 +53,15 @@ class FindAllReviewServiceTest {
         verify(reviewRepository).findAll(pageableCaptor.capture());
         assertThat(pageableCaptor.getValue().getPageNumber()).isEqualTo(2);
         assertThat(pageableCaptor.getValue().getPageSize()).isEqualTo(5);
+    }
+
+    @Test
+    void shouldRejectPaginationOutsideAllowedBounds() {
+        assertThatThrownBy(() -> service.execute(-1, 10))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> service.execute(10_001, 10))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> service.execute(0, 101))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }
