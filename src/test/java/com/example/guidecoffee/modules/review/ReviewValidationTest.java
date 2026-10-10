@@ -1,6 +1,7 @@
 package com.example.guidecoffee.modules.review;
 
 import com.example.guidecoffee.modules.review.dto.CreateReviewDTO;
+import com.example.guidecoffee.modules.review.dto.ReviewDTO;
 import com.example.guidecoffee.modules.review.model.ReviewModel;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -36,8 +37,27 @@ class ReviewValidationTest {
 
     @Test
     void shouldRejectInvalidCreateReviewFields() {
-        var review = new CreateReviewDTO(" ", "x".repeat(501), "", " ", 6,
+        var review = new CreateReviewDTO(" ", null, "", " ", 6,
                 null, -90.1, 180.1);
+
+        var violations = validator.validate(review);
+
+        assertThat(violations).extracting(v -> v.getPropertyPath().toString())
+                .contains("title", "description", "address", "rating", "latitude", "longitude");
+    }
+
+    @Test
+    void shouldAcceptReviewDtoAtInclusiveBoundaries() {
+        var review = new ReviewDTO("id", "Café", null, "Descrição", "Rua 1", 1,
+                -90.0, 180.0, null, null);
+
+        assertThat(validator.validate(review)).isEmpty();
+    }
+
+    @Test
+    void shouldRejectInvalidReviewDtoFields() {
+        var review = new ReviewDTO("id", " ", "x".repeat(501), "", " ", 6,
+                -90.1, 180.1, null, null);
 
         var violations = validator.validate(review);
 
