@@ -40,11 +40,9 @@ class ReviewControllerTest {
     }
 
     @Test
-    void shouldCreateReviewWithCreatedStatus() {
-        var input = new CreateReviewDTO("Café", null, "Descrição", "Rua 1", 4,
-                null, 0.0, 0.0);
-        var expected = new ReviewDTO("1", "Café", null, "Descrição", "Rua 1", 4,
-                0.0, 0.0, null, null);
+    void shouldCreateReviewWithCreatedStatus() throws Exception {
+        var input = new CreateReviewDTO("Café", null, "Descrição", "Rua 1", 4, null);
+        var expected = new ReviewDTO("1", "Café", null, "Descrição", "Rua 1", 4, null, null);
         when(createReviewService.execute(input)).thenReturn(expected);
 
         var response = controller.create(input);
@@ -57,7 +55,7 @@ class ReviewControllerTest {
     @Test
     void shouldReturnPaginatedReviewsWithOkStatus() {
         var page = new PageImpl<>(List.of(new ReviewDTO("1", "Café", null, null,
-                null, 4, 0.0, 0.0, null, null)), PageRequest.of(2, 5), 11);
+                null, 4, null, null)), PageRequest.of(2, 5), 11);
         when(findAllReviewService.execute(2, 5)).thenReturn(page);
 
         var response = controller.findAll(2, 5);
@@ -71,8 +69,7 @@ class ReviewControllerTest {
 
     @Test
     void shouldReturnReviewByIdWithOkStatus() {
-        var expected = new ReviewDTO("review-1", "Café", null, null, null,
-                4, 0.0, 0.0, null, null);
+        var expected = new ReviewDTO("review-1", "Café", null, null, null, 4, null, null);
         when(findOneReviewService.execute("review-1")).thenReturn(expected);
 
         var response = controller.findOne("review-1");

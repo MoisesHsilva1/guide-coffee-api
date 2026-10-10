@@ -35,8 +35,8 @@ class FindAllReviewServiceTest {
     void shouldFetchPageAndMapEveryReview() {
         var first = ReviewModel.builder().id("1").title("First").build();
         var second = ReviewModel.builder().id("2").title("Second").build();
-        var firstDto = new ReviewDTO("1", "First", null, null, null, null, null, null, null, null);
-        var secondDto = new ReviewDTO("2", "Second", null, null, null, null, null, null, null, null);
+        var firstDto = new ReviewDTO("1", "First", null, null, null, null, null, null);
+        var secondDto = new ReviewDTO("2", "Second", null, null, null, null, null, null);
         var page = new PageImpl<>(List.of(first, second));
 
         when(reviewRepository.findAll(org.mockito.ArgumentMatchers.any(Pageable.class))).thenReturn(page);

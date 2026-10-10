@@ -33,7 +33,7 @@ class FindOneReviewServiceTest {
     @Test
     void shouldReturnMappedReviewWhenIdExists() {
         var model = ReviewModel.builder().id("review-1").title("Café").build();
-        var expected = new ReviewDTO("review-1", "Café", null, null, null, null, null, null, null, null);
+        var expected = new ReviewDTO("review-1", "Café", null, null, null, null, null, null);
         when(reviewRepository.findById("review-1")).thenReturn(Optional.of(model));
         when(reviewMapper.toDTO(model)).thenReturn(expected);
 

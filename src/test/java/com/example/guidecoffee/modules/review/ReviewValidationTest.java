@@ -1,6 +1,7 @@
 package com.example.guidecoffee.modules.review;
 
 import com.example.guidecoffee.modules.review.dto.CreateReviewDTO;
+import com.example.guidecoffee.modules.review.dto.ReviewDTO;
 import com.example.guidecoffee.modules.review.model.ReviewModel;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -28,21 +29,36 @@ class ReviewValidationTest {
 
     @Test
     void shouldAcceptCreateReviewAtInclusiveBoundaries() {
-        var review = new CreateReviewDTO("Café", null, "Descrição", "Rua 1", 1,
-                null, -90.0, 180.0);
+        var review = new CreateReviewDTO("Café", null, "Descrição", "Rua 1", 1, null);
 
         assertThat(validator.validate(review)).isEmpty();
     }
 
     @Test
     void shouldRejectInvalidCreateReviewFields() {
-        var review = new CreateReviewDTO(" ", "x".repeat(501), "", " ", 6,
-                null, -90.1, 180.1);
+        var review = new CreateReviewDTO(" ", null, "", " ", 6, null);
 
         var violations = validator.validate(review);
 
         assertThat(violations).extracting(v -> v.getPropertyPath().toString())
-                .contains("title", "imageUrl", "description", "address", "rating", "latitude", "longitude");
+                .contains("title", "description", "address", "rating");
+    }
+
+    @Test
+    void shouldAcceptReviewDtoAtInclusiveBoundaries() {
+        var review = new ReviewDTO("id", "Café", null, "Descrição", "Rua 1", 1, null, null);
+
+        assertThat(validator.validate(review)).isEmpty();
+    }
+
+    @Test
+    void shouldRejectInvalidReviewDtoFields() {
+        var review = new ReviewDTO("id", " ", "x".repeat(501), "", " ", 6, null, null);
+
+        var violations = validator.validate(review);
+
+        assertThat(violations).extracting(v -> v.getPropertyPath().toString())
+                .contains("title", "imageUrl", "description", "address", "rating");
     }
 
     @Test
@@ -52,13 +68,11 @@ class ReviewValidationTest {
                 .description(" ")
                 .address(" ")
                 .raiting(0)
-                .latitude(-90.1)
-                .longitude(180.1)
                 .build();
 
         var violations = validator.validate(review);
 
         assertThat(violations).extracting(v -> v.getPropertyPath().toString())
-                .contains("title", "description", "address", "raiting", "latitude", "longitude");
+                .contains("title", "description", "address", "raiting");
     }
 }
