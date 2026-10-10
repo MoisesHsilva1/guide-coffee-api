@@ -46,7 +46,7 @@ class ImageStorageStrategyTest {
                 "guide-coffee/reviews/coffee"
         );
         when(cloudinary.uploader()).thenReturn(uploader);
-        when(uploader.upload(any(), anyMap())).thenReturn(Map.of(
+        when(uploader.upload(any(byte[].class), anyMap())).thenReturn(Map.of(
                 "secure_url", uploadedImage.secureUrl(),
                 "public_id", uploadedImage.publicId()
         ));
@@ -54,12 +54,16 @@ class ImageStorageStrategyTest {
         UploadedImage result = strategy.upload(file);
 
         assertThat(result).isEqualTo(uploadedImage);
+
+        ArgumentCaptor<byte[]> fileCaptor = ArgumentCaptor.forClass(byte[].class);
+        verify(uploader).upload(fileCaptor.capture(), anyMap());
+        assertThat(fileCaptor.getValue()).isEqualTo("image".getBytes());
     }
 
     @Test
     void shouldUploadImageToTheReviewsFolder() throws Exception {
         when(cloudinary.uploader()).thenReturn(uploader);
-        when(uploader.upload(any(), anyMap())).thenReturn(Map.of(
+        when(uploader.upload(any(byte[].class), anyMap())).thenReturn(Map.of(
                 "secure_url", "https://example.com/coffee.jpg",
                 "public_id", "guide-coffee/reviews/coffee"
         ));
@@ -67,7 +71,7 @@ class ImageStorageStrategyTest {
         strategy.upload(multipartFile());
 
         ArgumentCaptor<Map<String, Object>> options = ArgumentCaptor.forClass(Map.class);
-        verify(uploader).upload(any(), options.capture());
+        verify(uploader).upload(any(byte[].class), options.capture());
         assertThat(options.getValue())
                 .containsEntry("resource_type", "image")
                 .containsEntry("folder", "guide-coffee/reviews");
@@ -76,7 +80,7 @@ class ImageStorageStrategyTest {
     @Test
     void shouldPropagateCloudinaryIOException() throws Exception {
         when(cloudinary.uploader()).thenReturn(uploader);
-        when(uploader.upload(any(), anyMap())).thenThrow(new IOException("Cloudinary unavailable"));
+        when(uploader.upload(any(byte[].class), anyMap())).thenThrow(new IOException("Cloudinary unavailable"));
 
         assertThatThrownBy(() -> strategy.upload(multipartFile()))
                 .isInstanceOf(IOException.class)

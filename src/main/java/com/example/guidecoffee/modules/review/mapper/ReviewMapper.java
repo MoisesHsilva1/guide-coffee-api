@@ -9,17 +9,19 @@ import org.springframework.stereotype.Component;
 public class ReviewMapper {
 
     public ReviewModel toModel(CreateReviewDTO dto) {
+        return toModel(dto, null);
+    }
+
+    public ReviewModel toModel(CreateReviewDTO dto, String imageUrl) {
         if (dto == null) {
             return null;
         }
 
         return ReviewModel.builder()
                 .title(dto.title())
-                .imageUrl(dto.imageUrl())
+                .imageUrl(imageUrl)
                 .description(dto.description())
                 .address(dto.address())
-                .latitude(dto.latitude())
-                .longitude(dto.longitude())
                 .raiting(dto.rating())
                 .drinkType(dto.drinkType())
                 .build();
@@ -37,8 +39,6 @@ public class ReviewMapper {
                 model.getDescription(),
                 model.getAddress(),
                 model.getRaiting(),
-                model.getLatitude(),
-                model.getLongitude(),
                 model.getDrinkType(),
                 model.getCreatedAt()
         );
