@@ -1,5 +1,6 @@
 package com.example.guidecoffee.modules.review.dto;
 
+import com.example.guidecoffee.modules.filestorage.annotation.FileTypeRestriction;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;
@@ -14,6 +15,9 @@ public record CreateReviewDTO(
         @Size(max = 120)
         String title,
 
+        @FileTypeRestriction(
+                acceptedTypes = {"image/jpeg", "image/png", "image/webp"}
+        )
         MultipartFile imageUrl,
 
         @NotBlank

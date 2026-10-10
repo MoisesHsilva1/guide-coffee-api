@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -52,5 +53,15 @@ class FindAllReviewServiceTest {
         verify(reviewRepository).findAll(pageableCaptor.capture());
         assertThat(pageableCaptor.getValue().getPageNumber()).isEqualTo(2);
         assertThat(pageableCaptor.getValue().getPageSize()).isEqualTo(5);
+    }
+
+    @Test
+    void shouldRejectPaginationOutsideAllowedBounds() {
+        assertThatThrownBy(() -> service.execute(-1, 10))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> service.execute(10_001, 10))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> service.execute(0, 101))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }

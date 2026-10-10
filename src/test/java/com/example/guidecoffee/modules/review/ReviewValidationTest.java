@@ -8,6 +8,7 @@ import jakarta.validation.Validator;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.springframework.mock.web.MockMultipartFile;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,6 +43,20 @@ class ReviewValidationTest {
 
         assertThat(violations).extracting(v -> v.getPropertyPath().toString())
                 .contains("title", "description", "address", "rating");
+    }
+
+    @Test
+    void shouldRejectNonImageReviewUpload() {
+        var file = new MockMultipartFile(
+                "imageUrl",
+                "payload.txt",
+                "text/plain",
+                "not an image".getBytes()
+        );
+        var review = new CreateReviewDTO("Café", file, "Descrição", "Rua 1", 1, null);
+
+        assertThat(validator.validate(review)).extracting(v -> v.getPropertyPath().toString())
+                .contains("imageUrl");
     }
 
     @Test

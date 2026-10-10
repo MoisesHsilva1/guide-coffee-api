@@ -7,6 +7,7 @@ import com.example.guidecoffee.modules.review.dto.ReviewDTO;
 import com.example.guidecoffee.modules.review.mapper.ReviewMapper;
 import com.example.guidecoffee.modules.review.model.ReviewModel;
 import com.example.guidecoffee.modules.review.repository.ReviewRepository;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +23,7 @@ public class CreateReviewService {
     private final ReviewMapper reviewMapper;
 
     @Transactional
-    public ReviewDTO execute(CreateReviewDTO review) {
+    public ReviewDTO execute(@Valid CreateReviewDTO review) {
         UploadedImage uploadedImage = uploadImage(review.imageUrl());
         String imageUrl = uploadedImage == null ? null : uploadedImage.secureUrl();
 

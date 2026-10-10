@@ -9,6 +9,8 @@ import com.example.guidecoffee.shared.dto.PaginationMultipleResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,10 +22,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
 
 @RestController
 @RequestMapping("/api/v1/reviews")
 @RequiredArgsConstructor
+@Validated
 @Tag(name = "Reviews", description = "Avaliações de cafeterias")
 public class ReviewController {
     private final CreateReviewService createReviewService;
@@ -38,7 +42,10 @@ public class ReviewController {
 
     @GetMapping
     @Operation(summary = "Listar avaliações")
-    public ResponseEntity<PaginationMultipleResponse<ReviewDTO>> findAll(@RequestParam(defaultValue = "0") Integer offset, @RequestParam(defaultValue = "10") Integer limit) {
+    public ResponseEntity<PaginationMultipleResponse<ReviewDTO>> findAll(
+            @RequestParam(defaultValue = "0") @Min(0) @Max(10_000) Integer offset,
+            @RequestParam(defaultValue = "10") @Min(1) @Max(100) Integer limit
+    ) {
         var page = findAllReviewService.execute(offset, limit);
         return ResponseEntity.ok(new PaginationMultipleResponse<>(page));
     }
